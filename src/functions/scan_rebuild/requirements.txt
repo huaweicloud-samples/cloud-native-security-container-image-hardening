@@ -1,0 +1,8 @@
+# 镜像扫描联动重建函数依赖
+# 打包时安装到 zip 内（docs/09：FunctionGraph 打包必须自带 SDK 依赖）
+# 版本已钉定：实测 region 子模块（.v5.region.hss_region 等）在该版本可用
+
+huaweicloudsdkcore==3.1.211
+huaweicloudsdkhss==3.1.211
+huaweicloudsdkcodeartspipeline==3.1.211
+huaweicloudsdksmn==3.1.211

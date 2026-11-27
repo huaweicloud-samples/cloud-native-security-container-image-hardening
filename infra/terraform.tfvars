@@ -1,0 +1,16 @@
+region                = "cn-north-4"
+project_name          = "linux-baseline"
+image_name            = "linux-baseline"
+vpc_name              = "container-hardening-vpc"
+vpc_cidr              = "172.16.0.0/16"
+build_subnet_cidr     = "172.16.1.0/24"
+nat_spec              = "1"
+eip_bandwidth_size    = 5
+obs_assets_bucket     = "hardening-assets-dgcmy-001"
+obs_logs_bucket       = "hardening-logs-dgcmy-001"
+swr_organization      = ""
+codearts_project_name = "container-hardening"
+notify_email          = ""
+pipeline_id           = "01416e1038dd45e3a090e6018a0da961"
+schedule_enabled      = true
+image_scan_enabled    = false

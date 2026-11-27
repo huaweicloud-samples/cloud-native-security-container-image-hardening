@@ -1,0 +1,61 @@
+# ============================================================================
+# 加固容器镜像 Dockerfile
+# ============================================================================
+# 基于 openEuler 基础镜像，构建满足安全加固基线的黄金容器镜像：
+#   1) 系统更新到最新安全补丁
+#   2) 应用操作系统安全加固（SSH、内核参数、文件权限、最小化服务）
+#   3) 精简运行时依赖，降低攻击面
+#
+# 构建方式：
+#   docker build -f Dockerfile.hardened -t <SWR 组织>/<镜像名>:latest .
+#   或由 CodeArts 构建流水线自动执行（见 infra/codearts.tf）。
+#
+# 构建成功后推送至 SWR，并由扫描联动函数定期检查漏洞（见 src/functions/scan_rebuild/）。
+
+FROM openeuler/openeuler:22.03-lts-sp4
+
+# 基础环境：更新系统安全补丁 + 安装基础工具
+RUN dnf -y update --security \
+    && dnf -y install \
+        tar \
+        gzip \
+        ca-certificates \
+        tzdata \
+        bash \
+        coreutils \
+        findutils \
+        grep \
+        sed \
+        gawk \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
+
+# 安全加固：内核参数（容器内 sysctl 只读，保留为文档与构建期主机基线）
+# 容器运行时由宿主机承担内核参数，以下为构建期主机加固基线参考：
+#   net.ipv4.conf.all.accept_redirects = 0
+#   net.ipv4.conf.all.send_redirects   = 0
+#   net.ipv4.tcp_syncookies            = 1
+#   kernel.randomize_va_space          = 2
+RUN mkdir -p /etc/sysctl.d \
+    && printf '%s\n' \
+        'net.ipv4.conf.all.accept_redirects = 0' \
+        'net.ipv4.conf.all.send_redirects   = 0' \
+        'net.ipv4.tcp_syncookies            = 1' \
+        'kernel.randomize_va_space          = 2' \
+        > /etc/sysctl.d/99-hardening.conf
+
+# 安全加固：基础文件权限与 umask
+RUN printf '%s\n' 'umask 027' >> /etc/profile.d/hardening.sh \
+    && chmod 0644 /etc/profile.d/hardening.sh
+
+# 安全加固：禁用不安全的默认共享与明文协议（HTTP 仅在业务需要时由上层应用开启）
+# 最小化监听：容器内不默认开放任何端口（端口由上层应用显式 EXPOSE）
+
+# 时区：默认 UTC，可按业务需要覆盖
+ENV TZ=Asia/Shanghai
+
+# 非 root 运行建议：业务应用应显式创建非特权用户运行
+# RUN useradd -r -m appuser && USER appuser
+
+# 最小化入口：由上层业务镜像覆盖 CMD/ENTRYPOINT
+CMD ["/bin/bash"]

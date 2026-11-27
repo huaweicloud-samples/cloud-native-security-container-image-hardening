@@ -1,0 +1,29 @@
+# ============================================================================
+# CodeArts Build 代码化构建配置 - 容器镜像加固
+# ============================================================================
+# 构建流程：
+#   1. 拉取代码（含 Dockerfile.hardened）
+#   2. Docker 构建加固镜像
+#   3. 推送至 SWR 仓库
+#
+# 注意：代码仓（Repo）需在 CodeArts Repo 控制台创建后填入 repo_id
+#       SWR_PASSWORD 需在 CodeArts Build 控制台配置为环境变量
+
+version: "2.0"
+env:
+  resource:
+    type: docker
+    arch: x86
+    class: "2U8G"
+
+stages:
+  # 阶段 1: Docker 构建加固镜像
+  - name: Build_Hardened_Image
+    steps:
+      - name: Build_Docker_Image
+        type: Dockerfile
+        params:
+          Dockerfile: Dockerfile.hardened
+          Tag: latest
+          BuildArgs:
+            - REGION=${REGION:-cn-north-4}
