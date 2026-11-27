@@ -1,0 +1,29 @@
+###################################
+## 必填变量示例（apply 前复制为 terraform.tfvars 并修改）
+###################################
+
+region             = "cn-north-4"
+project_name       = "linux-baseline"
+image_name         = "linux-baseline"
+vpc_name           = "container-hardening-vpc"
+
+# ---- 自建网络（VPC/NAT/EIP 全部自建，不依赖外部资源）----
+vpc_cidr              = "172.16.0.0/16"
+# 构建子网（须落在 vpc_cidr 内）
+build_subnet_cidr     = "172.16.1.0/24"
+# NAT 规格（1=小型）与出网 EIP 带宽（Mbit/s）
+nat_spec              = "1"
+eip_bandwidth_size    = 5
+
+# OBS 桶名（全局唯一，请修改）
+obs_assets_bucket  = "hardening-assets-<your-suffix>"
+obs_logs_bucket    = "hardening-logs-<your-suffix>"
+
+swr_organization   = ""
+codearts_project_name = "container-hardening"
+
+# 通知邮箱（可选，留空不创建订阅）
+# notify_email     = "ops@example.com"
+
+# CodeArts 流水线 ID（控制台创建流水线后填入，见 codearts.tf）
+# pipeline_id      = "your-pipeline-id"

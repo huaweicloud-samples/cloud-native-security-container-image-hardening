@@ -1,0 +1,16 @@
+# 加固组件：最小化运行时
+# ----------------------------------------------------------------------------
+# 清理包缓存与临时文件，降低镜像体积与攻击面。
+
+name: minimal-runtime
+description: Keep runtime minimal to reduce attack surface
+schemaVersion: 1.0
+phases:
+  - name: build
+    steps:
+      - name: CleanCaches
+        action: ExecuteBash
+        inputs:
+          commands:
+            - dnf clean all
+            - rm -rf /var/cache/dnf

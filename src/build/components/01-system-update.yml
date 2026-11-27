@@ -1,0 +1,16 @@
+# 加固组件：系统安全更新
+# ----------------------------------------------------------------------------
+# 构建流水线应用的第一阶段：将基础镜像更新至最新安全补丁。
+
+name: system-security-update
+description: Apply latest OS security updates before hardening
+schemaVersion: 1.0
+phases:
+  - name: build
+    steps:
+      - name: UpdatePackages
+        action: ExecuteBash
+        inputs:
+          commands:
+            - dnf -y update --security
+            - dnf clean all

@@ -1,0 +1,21 @@
+# 加固组件：操作系统安全基线
+# ----------------------------------------------------------------------------
+# 应用内核参数、umask、文件权限等安全基线（RHEL Medium STIG 语义）。
+
+name: os-baseline-hardening
+description: Apply OS security baseline (kernel, umask, permissions)
+schemaVersion: 1.0
+phases:
+  - name: build
+    steps:
+      - name: HardeningKernel
+        action: ExecuteBash
+        inputs:
+          commands:
+            - printf '%s\n' 'net.ipv4.conf.all.accept_redirects = 0' 'net.ipv4.conf.all.send_redirects = 0' 'net.ipv4.tcp_syncookies = 1' 'kernel.randomize_va_space = 2' > /etc/sysctl.d/99-hardening.conf
+      - name: HardeningUmask
+        action: ExecuteBash
+        inputs:
+          commands:
+            - printf '%s\n' 'umask 027' >> /etc/profile.d/hardening.sh
+            - chmod 0644 /etc/profile.d/hardening.sh
